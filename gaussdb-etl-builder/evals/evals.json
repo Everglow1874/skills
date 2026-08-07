@@ -1,0 +1,35 @@
+{
+  "skill_name": "gaussdb-etl-builder",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "我要统计最近一次考试,年级里各科前十名的学生信息以及班主任信息,生成一张报表表。源表结构见附件 exam_source_tables.sql。请走完整流程生成 ETL 作业。这是自动化端到端运行,流程中凡是需要我确认的地方默认确认并继续,直到把 plan.md 和每步 SQL 写入输出目录。",
+      "expected_output": "写出 plan.md + 分步 SQL;目标表先建后写;Top-N 用 ROW_NUMBER 窗口函数;GaussDB 语法",
+      "files": ["inputs/exam_source_tables.sql"]
+    },
+    {
+      "id": 1,
+      "prompt": "把订单表和用户表加工成一张按月的用户消费宽表(每个用户每个自然月的消费总金额、订单数、所在城市)。源表结构见附件 orders_users.sql。这是自动化端到端运行,凡需确认处默认确认并继续,直到把 plan.md 和每步 SQL 写入输出目录。",
+      "expected_output": "按用户+月份粒度宽表;to_char/date_trunc 按月聚合;user_id JOIN;先建后写",
+      "files": ["inputs/orders_users.sql"]
+    },
+    {
+      "id": 2,
+      "prompt": "帮我把销售明细表加工成一张区域月度销售汇总表,生成 ETL 作业并写入输出目录。",
+      "expected_output": "主动索要源表结构,不臆造字段直接产出 SQL",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "这是每天 T+1 跑的增量作业:把交易流水表按天增量汇总成一张每日交易汇总表(按日期+渠道统计交易金额和笔数)。源表见附件 trade_source.sql,平台变量文档见 platform_variables.md。这是自动化端到端运行,凡需确认处默认确认并继续,直到把 plan.md 和每步 SQL 写入输出目录。",
+      "expected_output": "SQL 用 ${TX_DATE} 做增量过滤且不替换为字面量;说明变量含义;写出文件",
+      "files": ["inputs/trade_source.sql", "inputs/platform_variables.md"]
+    },
+    {
+      "id": 4,
+      "prompt": "基于已沉淀的知识文档 knowledge.md 和源表 exam_source_tables.sql,生成一张『各班级各科平均分』报表表的 ETL 作业。这是自动化端到端运行,凡需确认处默认确认并继续,直到把 plan.md 和每步 SQL 写入输出目录;完成后按知识文档的规则更新它。",
+      "expected_output": "复用知识文档关联键不重复追问;剔除缺考;更新知识文档;写出文件",
+      "files": ["inputs/exam_source_tables.sql", "inputs/knowledge.md"]
+    }
+  ]
+}
