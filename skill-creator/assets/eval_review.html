@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluation Review - __SKILL_NAME_PLACEHOLDER__</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+        }
+        
+        .header h1 {
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            background: #ecf0f1;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin: 20px;
+            border-radius: 4px;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .eval-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .eval-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .eval-id {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #27ae60;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .eval-content {
+            padding: 15px;
+        }
+        
+        .query-label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .query-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #219a52;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .add-eval {
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+        
+        .label {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+        
+        .label-trigger {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .label-no-trigger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Evaluation Review</h1>
+            <p>Review and edit the evaluation queries for <strong>__SKILL_NAME_PLACEHOLDER__</strong></p>
+        </div>
+        
+        <div class="description">
+            <strong>Skill Description:</strong> __SKILL_DESCRIPTION_PLACEHOLDER__
+        </div>
+        
+        <div class="content">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="total-count">0</div>
+                    <div class="stat-label">Total Queries</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="trigger-count">0</div>
+                    <div class="stat-label">Should Trigger</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="no-trigger-count">0</div>
+                    <div class="stat-label">Should Not Trigger</div>
+                </div>
+            </div>
+            
+            <div id="eval-list"></div>
+            
+            <div class="add-eval">
+                <button class="btn btn-primary" onclick="addEval()">+ Add New Query</button>
+            </div>
+            
+            <div class="actions" style="margin-top: 20px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="resetToOriginal()">Reset to Original</button>
+                <button class="btn btn-success" onclick="exportEvalSet()">Export Eval Set</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Placeholder data - will be replaced with actual eval data
+        let evalData = __EVAL_DATA_PLACEHOLDER__;
+        
+        function renderEvals() {
+            const container = document.getElementById('eval-list');
+            container.innerHTML = '';
+            
+            evalData.forEach((eval, index) => {
+                const div = document.createElement('div');
+                div.className = 'eval-item';
+                div.innerHTML = `
+                    <div class="eval-header">
+                        <span class="eval-id">
+                            Query ${index + 1}
+                            <span class="label ${eval.should_trigger ? 'label-trigger' : 'label-no-trigger'}">
+                                ${eval.should_trigger ? 'Should Trigger' : 'Should Not Trigger'}
+                            </span>
+                        </span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${eval.should_trigger ? 'checked' : ''} onchange="toggleTrigger(${index}, this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="eval-content">
+                        <label class="query-label">User Query:</label>
+                        <textarea class="query-textarea" onchange="updateQuery(${index}, this.value)">${eval.query}</textarea>
+                        <div class="actions">
+                            <button class="btn btn-danger" onclick="removeEval(${index})">Remove</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            
+            updateStats();
+        }
+        
+        function updateStats() {
+            document.getElementById('total-count').textContent = evalData.length;
+            document.getElementById('trigger-count').textContent = evalData.filter(e => e.should_trigger).length;
+            document.getElementById('no-trigger-count').textContent = evalData.filter(e => !e.should_trigger).length;
+        }
+        
+        function toggleTrigger(index, checked) {
+            evalData[index].should_trigger = checked;
+            renderEvals();
+        }
+        
+        function updateQuery(index, value) {
+            evalData[index].query = value;
+        }
+        
+        function addEval() {
+            evalData.push({
+                query: "",
+                should_trigger: true
+            });
+            renderEvals();
+        }
+        
+        function removeEval(index) {
+            evalData.splice(index, 1);
+            renderEvals();
+        }
+        
+        function resetToOriginal() {
+            if (confirm('Are you sure you want to reset to the original data?')) {
+                // This would need to be implemented with the original data
+                alert('Reset functionality would need original data to be stored');
+            }
+        }
+        
+        function exportEvalSet() {
+            // Filter out empty queries
+            const filteredData = evalData.filter(e => e.query.trim() !== '');
+            
+            const blob = new Blob([JSON.stringify(filteredData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'eval_set.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Initialize
+        renderEvals();
+    </script>
+</body>
+</html>
