@@ -67,6 +67,23 @@ CREATE TEMPORARY TABLE <tmp_table> (
 
 记住顺序铁律:临时表、目标表都要在写入它们的步骤**之前**创建。
 
+## 平台变量套用(日期/增量过滤)
+
+日期/增量过滤按 P0 确认的**作业类型**处理:
+
+- **P 转换作业**:用平台变量 `$ {TX_DATE}` 占位(业务日期=实例日期的前一天)。SQL 中**原样保留占位符**,不要展开成具体日期。
+- **I 初始化作业**:禁用平台变量,日期用**字面量**(用户给的日期或确认值)。
+
+示例(P 作业增量过滤):
+
+```sql
+-- 增量装载:取业务日期当天的交易
+INSERT INTO tmp_daily_trade
+SELECT BIZ_KEY, TX_TIME, AMOUNT
+FROM FACT_TRADE
+WHERE TX_DATE = '$ {TX_DATE}';
+```
+
 ## 常见转换套路
 
 > 下面的套路全部用「临时表两段式」：先 `CREATE TEMPORARY TABLE`，再 `INSERT INTO`。除非递归，不要出现 `WITH`。
