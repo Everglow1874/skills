@@ -33,17 +33,17 @@ gaussdb-etl-builder/
 ├── references/
 │   ├── gaussdb-sql.md                # 视需要补一句变量使用说明
 │   ├── supported-column-types.md     # 保留（类型白名单）
-│   └── platform-variables-example.md # 恢复：内置平台变量文档（原文件已删，重建）
+│   └── platform-variables.md          # 恢复：内置平台变量文档（原文件已删，重建）
 └── evals/
     └── evals.json                    # 改：增量用例断言调整，新增 I 初始化作业用例
 ```
 
-## 3. 内置平台变量文档 `references/platform-variables-example.md`
+## 3. 内置平台变量文档 `references/platform-variables.md`
 
 技能**直接读取**此文件参考，不需要用户另行提供。文档结构：
 
 ```markdown
-# 平台变量示例
+# 平台变量
 
 本技能**内置**的变量清单:技能直接读取此文件参考,由调度平台在作业运行时注入,SQL 里**原样保留占位符**。
 若平台后续新增变量,在此追加即可。
@@ -78,7 +78,7 @@ P0 收尾（复述需求、收集源表、确认数据区编码之后、进入 P
 - **P 转换**：周期性/按日加工（如「每天跑」「T+1」「增量」）→ **允许平台变量**，日期/增量过滤用 `$ {TX_DATE}` 占位。
 
 同步调整：
-- P0 的「注意」块改为：本技能**不加载知识文档**；平台变量文档为**内置** `references/platform-variables-example.md`，不向用户索要。
+- P0 的「注意」块改为：本技能**不加载知识文档**；平台变量文档为**内置** `references/platform-variables.md`，不向用户索要。
 - P2「如果需求带日期/增量语义…没有平台变量文档,日期用用户指定的值」改为按 I/P 分流：
   - **I**：日期/增量过滤一律用**字面量**或用户确认的日期。
   - **P**：日期/增量过滤用 `$ {TX_DATE}` 占位，**首次出现时向用户确认一次**变量含义（如「TX_DATE 是业务日期，即实例日期的前一天，对吗」），之后沿用。
@@ -109,7 +109,7 @@ P0 收尾（复述需求、收集源表、确认数据区编码之后、进入 P
 
 ## 7. 验收标准
 
-1. `references/platform-variables-example.md` 存在，只含 `$ {TX_DATE}` 一个变量，含使用约定。
+1. `references/platform-variables.md` 存在，只含 `$ {TX_DATE}` 一个变量，含使用约定。
 2. SKILL.md P0 包含作业类型（I/P）询问步骤；P0 注意块声明平台变量文档为内置、知识文档不支持。
 3. SKILL.md P2/P3 按 I/P 分流变量策略：I 用字面量、P 用 `$ {TX_DATE}` 占位且首次出现向用户确认。
 4. SKILL.md 正文不出现硬编码 `$ {...}` 模板。

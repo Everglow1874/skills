@@ -1,10 +1,10 @@
-# gaussdb-etl-builder 平台变量支持与作业类型判定实施计划
+﻿# gaussdb-etl-builder 平台变量支持与作业类型判定实施计划
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 恢复 gaussdb-etl-builder 技能的内置平台变量文档（`$ {TX_DATE}`），在 P0 增加作业类型（I/P）判定，按作业类型决定变量策略（I 禁变量、P 用变量占位），并同步更新 evals 用例。
 
-**Architecture:** 全部改动为文档文件：重建 `references/platform-variables-example.md`；在 `SKILL.md` 的 P0/P2/P3 与「关键原则回顾」按 I/P 分流变量规则；`gaussdb-sql.md` 补变量套用说明；`evals/evals.json` 更新增量用例断言并新增 I 初始化作业用例。无 Python 代码改动。
+**Architecture:** 全部改动为文档文件：重建 `references/platform-variables.md`；在 `SKILL.md` 的 P0/P2/P3 与「关键原则回顾」按 I/P 分流变量规则；`gaussdb-sql.md` 补变量套用说明；`evals/evals.json` 更新增量用例断言并新增 I 初始化作业用例。无 Python 代码改动。
 
 **Tech Stack:** Markdown 文档、JSON（evals）、现有 pytest（仅回归，不改）。
 
@@ -21,14 +21,14 @@
 ### Task 1: 重建内置平台变量文档
 
 **Files:**
-- Create: `gaussdb-etl-builder/references/platform-variables-example.md`
+- Create: `gaussdb-etl-builder/references/platform-variables.md`
 
 - [ ] **Step 1: 创建文件**
 
 写入以下内容：
 
 ```markdown
-# 平台变量示例
+# 平台变量
 
 本技能**内置**的变量清单:技能直接读取此文件参考,由调度平台在作业运行时注入,SQL 里**原样保留占位符**。若平台后续新增变量,在此追加即可。
 
@@ -47,16 +47,16 @@
 
 - [ ] **Step 2: 验证文件内容**
 
-Run: `Select-String -Path "gaussdb-etl-builder/references/platform-variables-example.md" -Pattern "TX_DATE" | Measure-Object | Select-Object -ExpandProperty Count`
+Run: `Select-String -Path "gaussdb-etl-builder/references/platform-variables.md" -Pattern "TX_DATE" | Measure-Object | Select-Object -ExpandProperty Count`
 Expected: `1`（只出现一个变量 TX_DATE，无 TX_DATE_NODASH / RUN_DATE / MONTH_FIRST_DAY）
 
-Run: `Select-String -Path "gaussdb-etl-builder/references/platform-variables-example.md" -Pattern "TX_DATE_NODASH|RUN_DATE|MONTH_FIRST_DAY"`
+Run: `Select-String -Path "gaussdb-etl-builder/references/platform-variables.md" -Pattern "TX_DATE_NODASH|RUN_DATE|MONTH_FIRST_DAY"`
 Expected: 无匹配行
 
 - [ ] **Step 3: 提交**
 
 ```bash
-git add gaussdb-etl-builder/references/platform-variables-example.md
+git add gaussdb-etl-builder/references/platform-variables.md
 git commit -m "docs: 重建内置平台变量文档(仅保留 TX_DATE)"
 ```
 
@@ -78,7 +78,7 @@ git commit -m "docs: 重建内置平台变量文档(仅保留 TX_DATE)"
 替换为：
 
 ```
-> 注意:本技能**不加载知识文档**;平台变量文档为**内置** `references/platform-variables-example.md`,直接读取参考,不向用户索要。
+> 注意:本技能**不加载知识文档**;平台变量文档为**内置** `references/platform-variables.md`,直接读取参考,不向用户索要。
 ```
 
 - [ ] **Step 2: 在 P0 收尾（确认数据区编码之后）追加作业类型确认步骤**
@@ -89,7 +89,7 @@ git commit -m "docs: 重建内置平台变量文档(仅保留 TX_DATE)"
 4. **确认作业类型**。在进入 P1 之前,主动向用户确认,不靠猜:
    > "本次作业是 **初始化作业(I)** 还是 **转换作业(P)**?初始化作业指一次性建表并装载存量/历史数据;转换作业指周期性/按日跑的加工。"
    - **I 初始化作业**(一次性建表 + 装载存量/历史):**禁用平台变量**,日期/增量过滤一律用**字面量**或用户确认的日期。
-   - **P 转换作业**(周期性/按日加工,如"每天跑""T+1""增量"):**允许平台变量**,日期/增量过滤用 `$ {TX_DATE}` 占位(业务日期=实例日期的前一天,见 `references/platform-variables-example.md`)。
+   - **P 转换作业**(周期性/按日加工,如"每天跑""T+1""增量"):**允许平台变量**,日期/增量过滤用 `$ {TX_DATE}` 占位(业务日期=实例日期的前一天,见 `references/platform-variables.md`)。
 ```
 
 - [ ] **Step 3: 验证 P0 改动**
@@ -310,7 +310,7 @@ Expected: 7 个测试全部 PASS（`test_creates_xlsx_with_12_headers`、`test_f
 
 - [ ] **Step 2: 全量 grep 一致性检查**
 
-Run: `Select-String -Path "gaussdb-etl-builder/SKILL.md","gaussdb-etl-builder/references/gaussdb-sql.md","gaussdb-etl-builder/references/platform-variables-example.md" -Pattern "TX_DATE_NODASH|RUN_DATE|MONTH_FIRST_DAY"`
+Run: `Select-String -Path "gaussdb-etl-builder/SKILL.md","gaussdb-etl-builder/references/gaussdb-sql.md","gaussdb-etl-builder/references/platform-variables.md" -Pattern "TX_DATE_NODASH|RUN_DATE|MONTH_FIRST_DAY"`
 Expected: 无匹配行（三个被删变量不再出现）
 
 Run: `Select-String -Path "gaussdb-etl-builder/SKILL.md" -Pattern "\$\{TX_DATE\}"`
@@ -338,7 +338,7 @@ git commit -m "docs: gaussdb-etl-builder 版本号升至 1.2.0"
 
 对照 `docs/superpowers/specs/2026-08-08-gaussdb-etl-builder-platform-variables-design.md` 第 7 节验收标准：
 
-1. `references/platform-variables-example.md` 存在，只含 `$ {TX_DATE}` 一个变量，含使用约定 → Task 1
+1. `references/platform-variables.md` 存在，只含 `$ {TX_DATE}` 一个变量，含使用约定 → Task 1
 2. SKILL.md P0 含作业类型（I/P）询问步骤；P0 注意块声明平台变量文档为内置、知识文档不支持 → Task 2
 3. SKILL.md P2/P3 按 I/P 分流变量策略：I 用字面量、P 用 `$ {TX_DATE}` 占位且首次出现向用户确认 → Task 3、4
 4. SKILL.md 正文不出现硬编码 `$ {...}` 模板 → Task 4 Step 3 已验
