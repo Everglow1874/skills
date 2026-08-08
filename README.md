@@ -16,7 +16,7 @@ skills/
 
 | 技能 | 版本 | 用途 |
 |---|---|---|
-| [gaussdb-etl-builder](./gaussdb-etl-builder/SKILL.md) | 1.1.0 | 把数据分析需求变成可执行的 GaussDB 数仓 ETL 作业：目标表字段定义 Excel（平台可直接导入建表）+ 临时表与清洗装载 SQL |
+| [gaussdb-etl-builder](./gaussdb-etl-builder/SKILL.md) | 1.3.0 | 把数据分析需求变成可执行的 GaussDB 数仓 ETL 作业：目标表字段定义 Excel（平台可直接导入建表）+ 临时表与清洗装载 SQL |
 | [skill-creator](./skill-creator/SKILL.md) | 1.0.0 | 创建新技能、修改优化已有技能、运行评估与基准测试、优化技能触发描述 |
 
 ## 使用方式
