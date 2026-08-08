@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 恢复 gaussdb-etl-builder 技能的内置平台变量文档（`$ {TX_DATE}`），在 P0 增加作业类型（I/P）判定，按作业类型决定变量策略（I 禁变量、P 用变量占位），并同步更新 evals 用例。
+**Goal:** 恢复 gaussdb-etl-builder 技能的内置平台变量文档（`${TX_DATE}`），在 P0 增加作业类型（I/P）判定，按作业类型决定变量策略（I 禁变量、P 用变量占位），并同步更新 evals 用例。
 
 **Architecture:** 全部改动为文档文件：重建 `references/platform-variables.md`；在 `SKILL.md` 的 P0/P2/P3 与「关键原则回顾」按 I/P 分流变量规则；`gaussdb-sql.md` 补变量套用说明；`evals/evals.json` 更新增量用例断言并新增 I 初始化作业用例。无 Python 代码改动。
 
@@ -14,7 +14,7 @@
 - pytest 必须禁用插件自动加载：`$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD="1"`
 - 用 `C:\app\anaconda3\python.exe` 跑 pytest（有 pytest 7.1.2 + openpyxl），不用 `C:\app\Python\Python310`（无 pytest）
 - 验证 JSON 合法：`python -m json.tool` 或 Python 一行读取
-- SKILL.md / references 中写占位符时用 `$ {TX_DATE}`（`$` 与 `{` 之间带空格），避免与技能系统模板渲染冲突；**SKILL.md 正文禁止出现连续 `$ {` 且无空格的写法**
+- 平台变量占位符的正确写法是不带空格：`${TX_DATE}`；文档中统一用此写法
 
 ---
 
@@ -36,13 +36,13 @@
 
 | 变量 | 含义 |
 |---|---|
-| `$ {TX_DATE}` | 业务日期,格式 `YYYY-MM-DD`,即**实例日期的前一天**(运行日减一天) |
+| `${TX_DATE}` | 业务日期,格式 `YYYY-MM-DD`,即**实例日期的前一天**(运行日减一天) |
 
 ## 使用约定
 
 1. **只用于 P 转换作业**。I 初始化作业禁用平台变量(见 SKILL.md P0),日期用字面量。
-2. **原样保留占位符**。生成的 SQL 中 `$ {TX_DATE}` 保持 `$ {...}` 语法,不要展开成字面日期。
-3. 需求的日期语义对应到 `$ {TX_DATE}`;其他格式(去横线等)后续按平台新增变量再补,不臆造变量名。
+2. **原样保留占位符**。生成的 SQL 中 `${TX_DATE}` 保持 `$ {...}` 语法,不要展开成字面日期。
+3. 需求的日期语义对应到 `${TX_DATE}`;其他格式(去横线等)后续按平台新增变量再补,不臆造变量名。
 ```
 
 - [ ] **Step 2: 验证文件内容**
@@ -89,7 +89,7 @@ git commit -m "docs: 重建内置平台变量文档(仅保留 TX_DATE)"
 4. **确认作业类型**。在进入 P1 之前,主动向用户确认,不靠猜:
    > "本次作业是 **初始化作业(I)** 还是 **转换作业(P)**?初始化作业指一次性建表并装载存量/历史数据;转换作业指周期性/按日跑的加工。"
    - **I 初始化作业**(一次性建表 + 装载存量/历史):**禁用平台变量**,日期/增量过滤一律用**字面量**或用户确认的日期。
-   - **P 转换作业**(周期性/按日加工,如"每天跑""T+1""增量"):**允许平台变量**,日期/增量过滤用 `$ {TX_DATE}` 占位(业务日期=实例日期的前一天,见 `references/platform-variables.md`)。
+   - **P 转换作业**(周期性/按日加工,如"每天跑""T+1""增量"):**允许平台变量**,日期/增量过滤用 `${TX_DATE}` 占位(业务日期=实例日期的前一天,见 `references/platform-variables.md`)。
 ```
 
 - [ ] **Step 3: 验证 P0 改动**
@@ -127,7 +127,7 @@ git commit -m "docs: SKILL.md P0 增加作业类型判定,平台变量文档改�
 ```
 如果需求带日期/增量语义(如"每天跑""按交易日""增量"),在这一步要想清楚是全量还是增量装载,反映到步骤设计里。日期/增量过滤按 P0 确认的**作业类型**处理:
 - **I 初始化作业**:日期/增量过滤一律用**字面量**(用户给的日期或确认值),禁用平台变量。
-- **P 转换作业**:日期/增量过滤用 `$ {TX_DATE}` 占位(业务日期=实例日期的前一天),**首次出现时向用户确认一次**变量含义(如「TX_DATE 是业务日期,即实例日期的前一天,对吗」),之后沿用。
+- **P 转换作业**:日期/增量过滤用 `${TX_DATE}` 占位(业务日期=实例日期的前一天),**首次出现时向用户确认一次**变量含义(如「TX_DATE 是业务日期,即实例日期的前一天,对吗」),之后沿用。
 ```
 
 - [ ] **Step 2: 验证 P2 改动**
@@ -155,7 +155,7 @@ git commit -m "docs: SKILL.md P2 日期/增量语义按作业类型 I/P 分流"
 
 ```
 **日期/增量过滤的变量套用(按 P0 作业类型)**:
-- **P 转换作业**:SQL 中日期/增量过滤条件(`WHERE ...`、`>=` 等)用 `$ {TX_DATE}` 占位;变量首次出现时已向用户确认,后续沿用;**原样输出占位符**,不展开成字面日期。
+- **P 转换作业**:SQL 中日期/增量过滤条件(`WHERE ...`、`>=` 等)用 `${TX_DATE}` 占位;变量首次出现时已向用户确认,后续沿用;**原样输出占位符**,不展开成字面日期。
 - **I 初始化作业**:凡涉及日期/增量过滤,用**字面量**(用户给的日期或确认值),绝不用平台变量。
 ```
 
@@ -171,7 +171,7 @@ git commit -m "docs: SKILL.md P2 日期/增量语义按作业类型 I/P 分流"
 
 ```
 - **产物落盘**——一定写文件,并报告路径。
-- **作业类型决定变量策略**——P0 确认是初始化作业(I)还是转换作业(P);I 禁用平台变量用字面量,P 用 `$ {TX_DATE}` 占位(首次出现向用户确认)。
+- **作业类型决定变量策略**——P0 确认是初始化作业(I)还是转换作业(P);I 禁用平台变量用字面量,P 用 `${TX_DATE}` 占位(首次出现向用户确认)。
 ```
 
 - [ ] **Step 3: 验证 P3 改动**
@@ -179,8 +179,8 @@ git commit -m "docs: SKILL.md P2 日期/增量语义按作业类型 I/P 分流"
 Run: `Select-String -Path "gaussdb-etl-builder/SKILL.md" -Pattern "变量套用|作业类型决定变量策略"`
 Expected: 各匹配一次
 
-Run: `Select-String -Path "gaussdb-etl-builder/SKILL.md" -Pattern "\$\{TX_DATE\}"`
-Expected: **无匹配**（禁止连续 `$ {` 无空格的写法出现在 SKILL.md 正文）
+Run: `Select-String -Path "gaussdb-etl-builder/SKILL.md" -Pattern "\$ \{TX_DATE\}"`
+Expected: **无匹配**（占位符统一用不带空格的 `${TX_DATE}`，不存在带空格写法）
 
 - [ ] **Step 4: 提交**
 
@@ -213,7 +213,7 @@ git commit -m "docs: SKILL.md P3 变量套用规则与关键原则补充"
 
 日期/增量过滤按 P0 确认的**作业类型**处理:
 
-- **P 转换作业**:用平台变量 `$ {TX_DATE}` 占位(业务日期=实例日期的前一天)。SQL 中**原样保留占位符**,不要展开成具体日期。
+- **P 转换作业**:用平台变量 `${TX_DATE}` 占位(业务日期=实例日期的前一天)。SQL 中**原样保留占位符**,不要展开成具体日期。
 - **I 初始化作业**:禁用平台变量,日期用**字面量**(用户给的日期或确认值)。
 
 示例(P 作业增量过滤):
@@ -223,7 +223,7 @@ git commit -m "docs: SKILL.md P3 变量套用规则与关键原则补充"
 INSERT INTO tmp_daily_trade
 SELECT BIZ_KEY, TX_TIME, AMOUNT
 FROM FACT_TRADE
-WHERE TX_DATE = '$ {TX_DATE}';
+WHERE TX_DATE = '${TX_DATE}';
 ```
 ```
 
@@ -257,7 +257,7 @@ git commit -m "docs: gaussdb-sql.md 补平台变量套用说明"
 替换为：
 
 ```
-"expected_output": "确认作业类型为 P 转换;日期/增量过滤用 $ {TX_DATE} 占位且首次出现向用户确认;全量/增量语义反映到步骤设计;目标表出 Excel,临时表/装载出 SQL"
+"expected_output": "确认作业类型为 P 转换;日期/增量过滤用 ${TX_DATE} 占位且首次出现向用户确认;全量/增量语义反映到步骤设计;目标表出 Excel,临时表/装载出 SQL"
 ```
 
 - [ ] **Step 2: 在 eval 6 之后新增 eval 7（I 初始化作业）**
@@ -338,9 +338,9 @@ git commit -m "docs: gaussdb-etl-builder 版本号升至 1.2.0"
 
 对照 `docs/superpowers/specs/2026-08-08-gaussdb-etl-builder-platform-variables-design.md` 第 7 节验收标准：
 
-1. `references/platform-variables.md` 存在，只含 `$ {TX_DATE}` 一个变量，含使用约定 → Task 1
+1. `references/platform-variables.md` 存在，只含 `${TX_DATE}` 一个变量，含使用约定 → Task 1
 2. SKILL.md P0 含作业类型（I/P）询问步骤；P0 注意块声明平台变量文档为内置、知识文档不支持 → Task 2
-3. SKILL.md P2/P3 按 I/P 分流变量策略：I 用字面量、P 用 `$ {TX_DATE}` 占位且首次出现向用户确认 → Task 3、4
+3. SKILL.md P2/P3 按 I/P 分流变量策略：I 用字面量、P 用 `${TX_DATE}` 占位且首次出现向用户确认 → Task 3、4
 4. SKILL.md 正文不出现硬编码 `$ {...}` 模板 → Task 4 Step 3 已验
 5. evals.json 有 eval 7（I 初始化作业），eval 3 断言按 P 作业更新 → Task 6
 6. 七个现有 pytest 测试仍然通过；evals.json 为合法 JSON → Task 7

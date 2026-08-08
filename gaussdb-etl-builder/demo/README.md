@@ -1,6 +1,6 @@
 # gaussdb-etl-builder 测试 demo
 
-用于快速验证 gaussdb-etl-builder 技能的 I/P 作业类型判定与平台变量（`$ {TX_DATE}`）策略。数据区编码示例统一用 `ABCD`。
+用于快速验证 gaussdb-etl-builder 技能的 I/P 作业类型判定与平台变量（`${TX_DATE}`）策略。数据区编码示例统一用 `ABCD`。
 
 ---
 
@@ -104,8 +104,8 @@ DIM_USER ──< FACT_TRADE >── DIM_CHANNEL
 
 1. P0 询问作业类型 → 识别为 **P 转换作业**。
 2. P1 目标表名 `ABCD_DATA.ABCD_DAILY_TRADE_SUMMARY`，字段长度继承源表。
-3. P2 日期过滤用 `$ {TX_DATE}` 占位，**首次出现向用户确认**变量含义。
-4. P3 SQL 中增量过滤 `WHERE TRADE_DATE = '$ {TX_DATE}'` 原样保留占位符、不展开。
+3. P2 日期过滤用 `${TX_DATE}` 占位，**首次出现向用户确认**变量含义。
+4. P3 SQL 中增量过滤 `WHERE TRADE_DATE = '${TX_DATE}'` 原样保留占位符、不展开。
 5. 产物：目标表字段定义 Excel + step SQL + plan.md 写入输出目录。
 
 ---
@@ -139,7 +139,7 @@ DIM_USER ──< FACT_TRADE >── DIM_CHANNEL
 1. P0 识别为 **I 初始化作业**。
 2. P1 目标表名 `ABCD_DATA.ABCD_TRADE_DETAIL_WIDE`（或技能建议名），字段长度继承源表。
 3. P2 计划为**全量装载**（无按日增量过滤），或若带日期条件则用字面量。
-4. P3 SQL 中**不出现** `$ {TX_DATE}` 占位符；日期条件（如有）用字面量。
+4. P3 SQL 中**不出现** `${TX_DATE}` 占位符；日期条件（如有）用字面量。
 5. 产物：目标表字段定义 Excel + step SQL + plan.md 写入输出目录。
 
 ---
@@ -154,5 +154,5 @@ DIM_USER ──< FACT_TRADE >── DIM_CHANNEL
 
 ### 验证通过判定
 
-- **场景一（P）**：SQL 日期过滤用 `WHERE TRADE_DATE = '$ {TX_DATE}'` 且未展开；首次出现有确认。
-- **场景二（I）**：SQL 中不出现 `$ {TX_DATE}`；日期过滤用字面量。
+- **场景一（P）**：SQL 日期过滤用 `WHERE TRADE_DATE = '${TX_DATE}'` 且未展开；首次出现有确认。
+- **场景二（I）**：SQL 中不出现 `${TX_DATE}`；日期过滤用字面量。

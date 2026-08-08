@@ -97,6 +97,6 @@ eval 2（索要源表）与 eval 6（仅 Excel）无装载步骤，不补。
 1. SKILL.md P3 含「装载排序规则(强制)」；关键原则回顾含「装载必排序」。
 2. gaussdb-sql.md Worked Example 装载步骤、按月聚合示例带 `ORDER BY`；含 `## 装载排序规则` 小节及 TOC 条目。
 3. evals 中 eval 0/1/3/4/5/7 的 expected_output 含排序断言；eval 2/6 不含（无装载步骤）。
-4. 文档中 `$ {TX_DATE}` 保持带空格写法，无连续 `${TX_DATE}`。
+4. 文档中占位符统一用不带空格的 `${TX_DATE}`，不出现带空格的 `$ {TX_DATE}`。
 5. 版本号升至 1.3.0。
 6. 现有 7 个 pytest 测试仍然通过。
