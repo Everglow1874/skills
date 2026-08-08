@@ -12,16 +12,21 @@
 |---|---|---|
 | `VARCHAR(n)` | 变长字符串(姓名、编码、名称) | 必须给长度 `n`;按业务上限留余量 |
 | `CHAR(n)` | 定长字符串(状态码、标志位) | 不足补空格;长度固定才用 |
-| `INT` | 整数(计数、小范围 ID) | 等价 `INTEGER` |
-| `BIGINT` | 大整数(主键、大计数) | ID/主键优先用它 |
-| `SMALLINT` | 小整数(枚举、0/1 标志) | 取值范围小才用 |
-| `NUMERIC(p,s)` | 精确数值(金额、比率、分数) | 等价 `DECIMAL(p,s)`;`p` 总位数、`s` 小数位 |
+| `TINYINT` | 小整数(-128~127) | 取值范围很小才用 |
+| `SMALLINT` | 小整数(枚举、0/1 标志) | 等价官方 `smallint(int2)`;取值范围小才用 |
+| `INTEGER` | 整数(计数、小范围 ID) | 等价官方 `integer(int4/int)`、别名 `INT` |
+| `BIGINT` | 大整数(主键、大计数) | ID/主键优先用;等价官方 `bigint(int8)` |
+| `NUMERIC(p,s)` | 精确数值(金额、比率、分数) | 等价 `DECIMAL(p,s)`、官方 `numeric(p,s)/decimal(p,s)`;`p` 总位数、`s` 小数位 |
 | `DATE` | 仅日期 | `YYYY-MM-DD` |
-| `TIMESTAMP` | 日期+时间 | 含时分秒 |
+| `TIME` | 仅时分秒 | 官方 `time` |
+| `TIMESTAMP` | 日期+时间**含时区** | 官方 `timestamp`(带时区) |
+| `TIMESTAMP WITHOUT TIME ZONE` | 日期+时间**不含时区** | 官方 `timestamp without time zone` |
+| `BOOLEAN` | 布尔 true/false/null | 主要用于标志位;数仓统计场景少用 |
 
 ## 使用约定
 
 - 列类型只能取自上表;拿不准就用语义最接近的允许类型,并在 `plan.md` 里注明取舍理由,**不要发明表外类型**(如 `FLOAT`、`JSON`、`MONEY`、`BLOB` 等,除非你在上表里加了它)。
+- 上表中标了「等价/官方」的类型是同一类型的不同写法,任取其一均可;`INTEGER`(或 `INT`)、`NUMERIC`(或 `DECIMAL`)、`TIMESTAMP`(带时区)与 `TIMESTAMP WITHOUT TIME ZONE`(不带时区)是**两种不同语义**,用时区需求区分。
 - 金额/分数等精确数值用 `NUMERIC(p,s)`/`DECIMAL(p,s)`,**不要用浮点**——会有精度问题。
 - 标识符与类型一样需大写书写(见 `gaussdb-sql.md` 的「标识符大小写」)。
 - 若某需求字段在白名单里找不到合适类型,先提示用户:可能需要在本文档里补充该平台支持的类型,再继续。

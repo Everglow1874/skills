@@ -17,7 +17,7 @@ GaussDB 使用 **PostgreSQL 兼容**语法。生成 ETL SQL 前读本文件，�
 
 > **字段类型只能从 `supported-column-types.md` 白名单里选**（平台支持有限）。那份文档是类型的唯一权威来源；本节只讲选型经验与方言坑，不另立类型清单。
 
-选型经验:短文本用 `VARCHAR(n)`（给够长度）;整数主键用 `BIGINT`;金额/分数用 `NUMERIC(p,s)`/`DECIMAL(p,s)`，绝不用浮点;仅日期用 `DATE`，带时分秒用 `TIMESTAMP`。拿不准就选语义最接近的**白名单内**类型并在 `plan.md` 注明。
+选型经验:短文本用 `VARCHAR(n)`（给够长度）;整数主键用 `BIGINT`，范围小的计数用 `INTEGER`（别名 `INT`），枚举/0-1 标志用 `SMALLINT`，取值很小的整数用 `TINYINT`;金额/分数用 `NUMERIC(p,s)`/`DECIMAL(p,s)`，绝不用浮点;仅日期用 `DATE`;仅时分秒用 `TIME`;日期时间需含时区用 `TIMESTAMP`、不含时区用 `TIMESTAMP WITHOUT TIME ZONE`;布尔标志用 `BOOLEAN`（数仓统计场景少用）。拿不准就在选语义最接近的**白名单内**类型并在 `plan.md` 注明。
 
 常见坑:
 - `VARCHAR` 一定带长度，别裸写 `VARCHAR`。
@@ -61,7 +61,7 @@ GaussDB 使用 **PostgreSQL 兼容**语法。生成 ETL SQL 前读本文件，�
 -- ============================================================
 CREATE TEMPORARY TABLE <tmp_table> (
     COL_A    VARCHAR(100) NOT NULL,  -- 注释
-    COL_B    INT          NOT NULL,  -- 注释
+    COL_B    INTEGER     NOT NULL,  -- 注释
     COL_C    NUMERIC(10,2)           -- 注释
 );
 ```
@@ -98,7 +98,7 @@ CREATE TEMPORARY TABLE tmp_ranked (
     SUBJECT_ID  VARCHAR(50),
     STUDENT_ID  VARCHAR(50),
     SCORE       NUMERIC(5,1),
-    RN          INT
+    RN          INTEGER
 );
 -- Step B: 装载排名中间结果
 INSERT INTO tmp_ranked
@@ -121,7 +121,7 @@ SELECT * FROM tmp_ranked WHERE RN <= 10;
 CREATE TEMPORARY TABLE tmp_dedup (
     BIZ_KEY      VARCHAR(50),
     UPDATE_TIME  TIMESTAMP,
-    RN           INT
+    RN           INTEGER
 );
 -- Step B: 装载
 INSERT INTO tmp_dedup
@@ -164,7 +164,7 @@ GROUP BY user_id, to_char(order_date, 'YYYY-MM');
 |---|---|---|---|---|---|---|---|---|---|---|---|
 |  | EXAM_NAME | 考试名称 | VARCHAR | 100 |  | 否 | 否 | 否 | 是 |  | 考试名称 |
 |  | SUBJECT_NAME | 科目名称 | VARCHAR | 20 |  | 否 | 否 | 否 | 是 |  | 科目名称 |
-|  | RANK | 排名 | INT |  |  | 否 | 否 | 否 | 是 |  | 排名（1-10） |
+|  | RANK | 排名 | INTEGER |  |  | 否 | 否 | 否 | 是 |  | 排名（1-10） |
 |  | STUDENT_ID | 学号 | VARCHAR | 20 |  | 否 | 否 | 否 | 是 |  | 学号 |
 |  | STUDENT_NAME | 学生姓名 | VARCHAR | 50 |  | 否 | 否 | 否 | 是 |  | 学生姓名 |
 |  | GENDER | 性别 | VARCHAR | 4 |  | 否 | 否 | 否 | 是 |  | 性别 |
@@ -209,7 +209,7 @@ CREATE TEMPORARY TABLE tmp_ranked_scores (
     SUBJECT_ID VARCHAR(50)  NOT NULL,
     STUDENT_ID VARCHAR(50)  NOT NULL,
     SCORE      NUMERIC(5,1),
-    RN         INT
+    RN         INTEGER
 );
 ```
 

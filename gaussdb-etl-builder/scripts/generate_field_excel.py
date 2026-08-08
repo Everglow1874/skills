@@ -11,8 +11,9 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill
 
 WHITELIST_TYPES = {
-    "VARCHAR", "CHAR", "INT", "BIGINT", "SMALLINT",
-    "NUMERIC", "DECIMAL", "DATE", "TIMESTAMP",
+    "VARCHAR", "CHAR", "TINYINT", "SMALLINT", "INTEGER", "BIGINT",
+    "NUMERIC", "DECIMAL", "DATE", "TIME", "TIMESTAMP",
+    "TIMESTAMP WITHOUT TIME ZONE", "BOOLEAN",
 }
 
 HEADERS = ["属性", "英文名", "中文名", "数据类型", "长度", "精度",

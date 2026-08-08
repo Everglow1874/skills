@@ -16,7 +16,7 @@ FIELDS = json.dumps([
         "nullable": "是", "default": None, "remark": "考试名称"
     },
     {
-        "english": "RANK", "chinese": "排名", "type": "INT",
+        "english": "RANK", "chinese": "排名", "type": "INTEGER",
         "length": None, "precision": None,
         "is_pk": True, "is_dist_key": True, "is_part_key": True,
         "nullable": "否", "default": None, "remark": "排名（1-10）"
@@ -91,6 +91,18 @@ def test_attribute_column_uses_passed_value(tmp_path):
     ws = wb.active
     rows = list(ws.iter_rows(min_row=2, values_only=True))
     assert rows[0][0] == "目标表"
+
+
+def test_new_whitelist_types_pass(tmp_path):
+    for ftype in ["TINYINT", "TIME", "TIMESTAMP WITHOUT TIME ZONE", "BOOLEAN", "INTEGER"]:
+        fields = json.dumps([{
+            "english": "COL", "chinese": "列", "type": ftype,
+            "length": None, "precision": None,
+            "is_pk": False, "is_dist_key": False, "is_part_key": False,
+            "nullable": "是", "default": None, "remark": ""
+        }])
+        result, out = run_script(tmp_path, fields=fields)
+        assert result.returncode == 0, f"{ftype}: {result.stderr}"
 
 
 def test_invalid_type_aborts(tmp_path):
