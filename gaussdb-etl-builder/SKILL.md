@@ -1,5 +1,6 @@
 ---
 name: gaussdb-etl-builder
+version: 1.1.0
 description: >-
   把一个数据分析需求变成可执行的 GaussDB 数仓 ETL 作业:生成目标表字段定义 Excel(平台可直接导入建表)、
   临时表与清洗装载 SQL。当用户想根据需求生成数仓加工任务、规划 ETL 步骤、生成目标表字段定义、写临时表/清洗装载 SQL,
