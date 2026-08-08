@@ -22,7 +22,7 @@
     {
       "id": 3,
       "prompt": "这是每天 T+1 跑的增量作业:把交易流水表按天增量汇总成一张每日交易汇总表(按日期+渠道统计交易金额和笔数)。源表见附件 trade_source.sql。这是自动化端到端运行,凡需确认处默认确认并继续,直到把目标表字段定义 Excel、plan.md 和每步 SQL 写入输出目录。",
-      "expected_output": "SQL 用用户确认的日期做增量过滤;全量/增量语义反映到步骤设计;目标表出 Excel,临时表/装载出 SQL",
+      "expected_output": "确认作业类型为 P 转换;日期/增量过滤用 $ {TX_DATE} 占位且首次出现向用户确认;全量/增量语义反映到步骤设计;目标表出 Excel,临时表/装载出 SQL",
       "files": ["inputs/trade_source.sql"]
     },
     {
@@ -42,6 +42,12 @@
       "prompt": "统计各科前十名并生成报表表(源表见 exam_source_tables.sql)。请生成目标表字段定义 Excel。这是自动化端到端运行,凡需确认处默认确认并继续。",
       "expected_output": "生成 12 列表头的 .xlsx(属性|英文名|中文名|数据类型|长度|精度|主键|分布键|分区键|是否允许空值|默认值|备注);属性列默认不填;主键字段三列均为'是';非主键允许空值为'是'",
       "files": ["inputs/exam_source_tables.sql"]
+    },
+    {
+      "id": 7,
+      "prompt": "这是初始化作业(I):一次性把交易流水历史存量数据全部装载到一张交易明细宽表(目标表建好后装载全量历史,不是增量)。源表见附件 trade_source.sql。这是自动化端到端运行,凡需确认处默认确认并继续,直到把目标表字段定义 Excel、plan.md 和每步 SQL 写入输出目录。",
+      "expected_output": "确认作业类型为 I 初始化;日期/增量过滤用字面量,SQL 中不出现平台变量占位符;目标表出 Excel,临时表/装载出 SQL",
+      "files": ["inputs/trade_source.sql"]
     }
   ]
 }
